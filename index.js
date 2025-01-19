@@ -20,6 +20,8 @@ function handleRateChange(event) {
     value = parseHR(event.target.value)
     console.log(value)
     bpm.textContent = value
+
+    updateChart(value)
 }
 async function connectDevice() {
     if(device.gatt.connected) return;
@@ -53,5 +55,55 @@ async function init(params) {
     UI.classList.remove("hide")
 
 }
+
+var dps = []
+var chart;
+var start = Date.now()
+var updateInterval = 100
+
+// chart creation
+window.onload = function () {
+
+    // var dps = [{x: 1, y: 10}, {x: 2, y: 13}, {x: 3, y: 18}, {x: 4, y: 20}, {x: 5, y: 17},{x: 6, y: 10}, {x: 7, y: 13}, {x: 8, y: 18}, {x: 9, y: 20}, {x: 10, y: 17}];   //dataPoints. 
+    
+
+    chart = new CanvasJS.Chart("chartContainer",{
+        title :{
+            text: "Live Data"
+        },
+        axisX: {						
+            title: "Axis X Title"
+        },
+        axisY: {						
+            title: "Units"
+        },
+        data: [{
+            type: "line",
+            dataPoints : dps
+        }]
+    });
+
+    chart.render();
+    
+
+  // update chart after specified time. 
+
+};
+
+
+var updateChart = function (hr) {
+       
+    
+    dps.push({x: (Date.now() - start)/1000,y: hr});
+    if (dps.length >  10 )
+    {
+        dps.shift();				
+    }
+
+    chart.render();		
+
+}
+
+
 
 connectButton.addEventListener("click", init)
