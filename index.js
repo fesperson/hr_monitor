@@ -3,6 +3,9 @@ const errorTxt = document.querySelector(".error")
 const connectUI = document.querySelector(".connect-ui")
 const UI = document.querySelector(".ui")
 const bpm = document.querySelector(".bpm")
+const stopButton = document.querySelector(".stop")
+const startButton = document.querySelector(".start")
+
 
 let device;
 let heartRateChar;
@@ -34,6 +37,11 @@ async function connectDevice() {
     await startMonitoring()
 }
 
+function pauseBPM() {
+    UI.classList.add("hide")
+    connectUI.classList.remove("hide")
+    chart.render()
+}
 
 function parseHR(value) {
     const is16Bits = value.getUint8(0) & 0x1;
@@ -63,47 +71,55 @@ var updateInterval = 100
 
 // chart creation
 window.onload = function () {
-
-    // var dps = [{x: 1, y: 10}, {x: 2, y: 13}, {x: 3, y: 18}, {x: 4, y: 20}, {x: 5, y: 17},{x: 6, y: 10}, {x: 7, y: 13}, {x: 8, y: 18}, {x: 9, y: 20}, {x: 10, y: 17}];   //dataPoints. 
-    
-
-    chart = new CanvasJS.Chart("chartContainer",{
-        title :{
-            text: "Live Data"
-        },
-        axisX: {						
-            title: "Axis X Title"
-        },
-        axisY: {						
-            title: "Units"
-        },
-        data: [{
-            type: "line",
-            dataPoints : dps
-        }]
-    });
-
-    chart.render();
-    
-
-  // update chart after specified time. 
-
+    createChart()
 };
+
+createChart = function () {
+  // var dps = [{x: 1, y: 10}, {x: 2, y: 13}, {x: 3, y: 18}, {x: 4, y: 20}, {x: 5, y: 17},{x: 6, y: 10}, {x: 7, y: 13}, {x: 8, y: 18}, {x: 9, y: 20}, {x: 10, y: 17}];   //dataPoints. 
+    
+
+  chart = new CanvasJS.Chart("chartContainer",{
+    title :{
+        text: "Heart Rate Graph",
+        fontFamily: "arial"
+    },
+    axisX: {						
+        title: "Seconds"
+    },
+    axisY: {						
+        title: "BPM"
+    },
+    data: [{
+        type: "line",
+        dataPoints : dps
+    }]
+});
+
+chart.render();
+
+
+// update chart after specified time. 
+}
+
+var restartBPM = function() {
+    dps = []
+    createChart()
+}
 
 
 var updateChart = function (hr) {
        
     
     dps.push({x: (Date.now() - start)/1000,y: hr});
-    if (dps.length >  10 )
-    {
-        dps.shift();				
-    }
+    // if (dps.length >  10 )
+    // {
+    //     dps.shift();				
+    // }
 
     chart.render();		
 
 }
 
-
-
+startButton.addEventListener('click', restartBPM)
+stopButton.addEventListener('click', pauseBPM)
 connectButton.addEventListener("click", init)
