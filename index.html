@@ -1,37 +1,51 @@
 <!DOCTYPE html>
 <html lang="en">
-  <head>
+
+<head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <meta http-equiv="X-UA-Compatible" content="ie=edge" />
-    <title>BT Heart Monitor</title>
+    <title>Resting Heart Rate Test</title>
     <link rel="stylesheet" href="style.css" />
-  </head>
-  <body>
+</head>
+
+<body>
+    <h1>Resting Heart Rate Test</h1>
+    <br>
     <div class="connect-ui">
-      <button class="connect">connect</button>
-      <div>
-        No heart monitor device?
-        <a
-          href="https://github.com/megaconfidence/bt-heart-monitor#set-up-a-heart-monitor-emulator"
-          target="_blank"
-          >Set up an emulator</a
-        >
-      </div>
-      <div class="error hide">
-        ⚠️ This browser does not support the Web Bluetooth API. Please try a
-        different browser
-      </div>
+        <p>Ensure you are seated and relaxed before starting the test. Click below to connect bluetooth heart rate
+            monitor.</p>
+        <br>
+        <button id="connect">connect</button>
+        <div class="error hide">
+            ⚠️ This browser does not support the Web Bluetooth API. Please try a
+            different browser
+        </div>
     </div>
     <div class="ui hide">
-      <div id="chartContainer" style="height: 300px; width: 100%;"></div>
-      <div class="heart">       
-        <div class="bpm">--</div>
-      </div>
-      <button class="start">restart</button>
-      <button class="stop">pause</button>
+        <div class="uiContainer">
+            <div id="chartContainer" style="height: 300px; width: 100%;"></div>
+            <div class="heart">
+                Current HR: 
+                <div class="bpm">--</div>
+                Average HR:
+                <div class="bpmAvg">--</div>
+            </div>
+            <div> 
+                <button id="start">restart</button>
+                <button id="pause" class="start-button">start</button>
+            </div>
+            <button id="finis">Finish Test</button>
+        </div>
+    </div>
+    <div class="result hide">
+        <h3>Your resting HR was:</h3>
+        <h2 id="bpmResult">--</h2>
+        <h3>Input your age to find out how your HR compares</h3>
+        <input type="number">
     </div>
     <script src="index.js"></script>
     <script src="https://cdn.canvasjs.com/canvasjs.min.js"></script>
-  </body>
+</body>
+
 </html>

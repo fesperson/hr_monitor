@@ -1,14 +1,17 @@
-const connectButton = document.querySelector(".connect")
+const connectButton = document.getElementById("connect")
 const errorTxt = document.querySelector(".error")
 const connectUI = document.querySelector(".connect-ui")
 const UI = document.querySelector(".ui")
 const bpm = document.querySelector(".bpm")
-const stopButton = document.querySelector(".stop")
-const startButton = document.querySelector(".start")
+const pauseButton = document.getElementById("pause")
+const startButton = document.getElementById("start")
+const bpmAvg = document.querySelector(".bpmAvg")
 
 
 let device;
 let heartRateChar;
+let isPaused=true;
+let hrList = [0, 0];
 
 async function requestDevice() {
     device = await navigator.bluetooth.requestDevice({
@@ -20,11 +23,17 @@ async function requestDevice() {
 }
 
 function handleRateChange(event) {
-    value = parseHR(event.target.value)
-    console.log(value)
-    bpm.textContent = value
+    if (!isPaused) {
+        value = parseHR(event.target.value)
+        console.log(value)
+        bpm.textContent = value
+        updateChart(value)
 
-    updateChart(value)
+        hrList[0] += value;
+        hrList[1] += 1;
+        avg = hrList[0] / hrList[1]
+        bpmAvg.textContent = Number( avg.toPrecision(3) )
+    }
 }
 async function connectDevice() {
     if(device.gatt.connected) return;
@@ -37,11 +46,6 @@ async function connectDevice() {
     await startMonitoring()
 }
 
-function pauseBPM() {
-    UI.classList.add("hide")
-    connectUI.classList.remove("hide")
-    chart.render()
-}
 
 function parseHR(value) {
     const is16Bits = value.getUint8(0) & 0x1;
@@ -66,7 +70,7 @@ async function init(params) {
 
 var dps = []
 var chart;
-var start = Date.now()
+var start = Date.now();
 var updateInterval = 100
 
 // chart creation
@@ -75,35 +79,41 @@ window.onload = function () {
 };
 
 createChart = function () {
-  // var dps = [{x: 1, y: 10}, {x: 2, y: 13}, {x: 3, y: 18}, {x: 4, y: 20}, {x: 5, y: 17},{x: 6, y: 10}, {x: 7, y: 13}, {x: 8, y: 18}, {x: 9, y: 20}, {x: 10, y: 17}];   //dataPoints. 
-    
-
   chart = new CanvasJS.Chart("chartContainer",{
-    title :{
-        text: "Heart Rate Graph",
-        fontFamily: "arial"
-    },
-    axisX: {						
-        title: "Seconds"
-    },
-    axisY: {						
-        title: "BPM"
-    },
-    data: [{
-        type: "line",
-        dataPoints : dps
-    }]
-});
+        axisX: {						
+            title: "Seconds"
+        },
+        axisY: {						
+            title: "BPM"
+        },
+        data: [{
+            type: "line",
+            dataPoints : dps
+        }]
+    });
 
-chart.render();
-
-
-// update chart after specified time. 
+    chart.render();
+    // update chart after specified time. 
 }
 
 var restartBPM = function() {
     dps = []
     createChart()
+}
+
+var pauseBPM = function() {
+    console.log("pausing")
+    if (isPaused) {
+        isPaused = false;
+        pauseButton.textContent = "pause"
+        pauseButton.classList.add("pause-button")
+    }
+    else {
+        isPaused = true;
+        pauseButton.textContent = "start"
+        pauseButton.classList.add("start-button")
+    }
+
 }
 
 
@@ -115,11 +125,11 @@ var updateChart = function (hr) {
     // {
     //     dps.shift();				
     // }
-
+    
     chart.render();		
 
 }
 
-startButton.addEventListener('click', restartBPM)
-stopButton.addEventListener('click', pauseBPM)
-connectButton.addEventListener("click", init)
+connectButton.addEventListener("click", init);
+startButton.addEventListener('click', restartBPM);
+pauseButton.addEventListener('click', pauseBPM);
